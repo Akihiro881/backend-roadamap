@@ -7,9 +7,11 @@ type person struct {
 	age  int
 }
 
+// personそのものではなくperson型へのポインタを返す
 func newPerson(name string) *person {
 	p := person{name: name}
 	p.age = 42
+	//p(person型)のアドレスを返す
 	return &p
 }
 
