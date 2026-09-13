@@ -24,7 +24,7 @@ func makeTea(arg int) error {
 	return nil
 }
 
-func main() {
+func main4() {
 	for _, i := range []int{7, 42} {
 		if r, e := f(i); e != nil {
 			fmt.Println("f failed:", e)

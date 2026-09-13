@@ -6,7 +6,7 @@ func vals() (int, int) {
 	return 3, 7
 }
 
-func main() {
+func main10() {
 	a, b := vals()
 	fmt.Println(a)
 	fmt.Println(b)

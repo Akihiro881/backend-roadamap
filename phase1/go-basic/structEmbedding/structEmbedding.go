@@ -15,7 +15,7 @@ type container struct {
 	str string
 }
 
-func main() {
+func main15() {
 	co := container{
 		base: base{
 			num: 1,

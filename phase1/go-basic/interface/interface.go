@@ -10,17 +10,17 @@ type geometry interface {
 	perim() float64
 }
 
-type rect struct {
+type rect1 struct {
 	width, height float64
 }
 type circle struct {
 	radius float64
 }
 
-func (r rect) area() float64 {
+func (r rect1) area() float64 {
 	return r.width * r.height
 }
-func (r rect) perim() float64 {
+func (r rect1) perim() float64 {
 	return 2*r.width + 2*r.height
 }
 func (c circle) area() float64 {
@@ -34,8 +34,8 @@ func measure(g geometry) {
 	fmt.Println(g.area())
 	fmt.Println(g.perim())
 }
-func main() {
-	r := rect{width: 3, height: 4}
+func main7() {
+	r := rect1{width: 3, height: 4}
 	c := circle{radius: 5}
 
 	measure(r)

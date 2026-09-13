@@ -15,7 +15,7 @@ func newPerson(name string) *person {
 	return &p
 }
 
-func main() {
+func main16() {
 	fmt.Println(person{"Bob", 20})
 
 	fmt.Println(person{name: "Alice", age: 30})

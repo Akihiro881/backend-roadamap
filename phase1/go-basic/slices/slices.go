@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func main() {
+func main14() {
 	s := make([]string, 3)
 	fmt.Println("emp", s)
 
