@@ -29,17 +29,20 @@ func cat(w io.Writer, r io.Reader) error {
 func main() {
 
 	var command string = os.Args[1]
-	var filepath string = os.Args[2]
-	fmt.Println(command)
-	fmt.Println(filepath)
-	if command == "cat" {
-		f, err := os.Open(filepath)
-		if err != nil {
-			fmt.Println(err)
+	filepathes := os.Args[1:] // 引数だけを切り出す
+	for _, filepath := range filepathes {
+		fmt.Println(command)
+		fmt.Println(filepath)
+		if command == "cat" {
+			f, err := os.Open(filepath)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			caterr := cat(os.Stdout, f)
+			fmt.Println(caterr)
 		}
 
-		caterr := cat(os.Stdout, f)
-		fmt.Println(caterr)
 	}
 
 }
