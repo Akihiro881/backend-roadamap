@@ -30,17 +30,20 @@ func main() {
 
 	var command string = os.Args[1]
 	filepathes := os.Args[1:] // 引数だけを切り出す
-	for _, filepath := range filepathes {
-		fmt.Println(command)
-		fmt.Println(filepath)
-		if command == "cat" {
+
+	fmt.Println(command)
+	fmt.Println("以下catコマンドだよ")
+	if command == "cat" {
+		for _, filepath := range filepathes {
+
+			//fmt.Println(filepath)
+
 			f, err := os.Open(filepath)
 			if err != nil {
 				fmt.Println(err)
 			}
-
-			caterr := cat(os.Stdout, f)
-			fmt.Println(caterr)
+			cat(os.Stdout, f)
+			//fmt.Println(caterr)
 		}
 
 	}
