@@ -46,6 +46,9 @@ func catn(w io.Writer, r io.Reader) error {
 		if err != nil {
 			return err
 		}
+		if err == io.EOF {
+			return nil
+		}
 		n++
 	}
 }
