@@ -2,47 +2,119 @@ package main
 
 import (
 	"bufio"
+	"flag"
+	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
-func grep(w io.Writer, r io.Reader, pattern string, color bool) (str, text, err error) {
+func main() {
+	flag.Parse()
+
+	if flag.NArg() < 1 {
+		fmt.Fprintln(os.Stderr, "usage: mygrep [options] pattern [file...]")
+		os.Exit(2)
+	}
+
+	color := isTerminal(os.Stdout)
+
+	pattern := flag.Arg(0)
+	files := flag.Args()[1:]
+
+	hasError := false
+	for _, path := range files {
+		f, err := os.Open(path)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			hasError = true
+			continue
+		}
+		grep(os.Stdout, f, pattern, color)
+
+		f.Close()
+	}
+	if hasError {
+		os.Exit(1)
+	}
+
+}
+
+func grep(w io.Writer, r io.Reader, pattern string, color bool) (ismatch bool, err error) {
 	br := bufio.NewReader(r)
 
-	wordPoint := []int{}
+	matched := false
+
 	for {
-		//readstringで読むんじゃなくてreadで読んだほうがよい？
-		//bufで読むと単語の途中で切れる可能性あるからなし
-		//行単位で読んでその行に対応するインデックスを格納する
+
 		line, err := br.ReadString('\n')
-		tansaku(line, pattern, wordPoint, false)
+		if color {
+			positions := findAll(line, pattern)
+
+			if len(positions) > 0 { //一致する単語がある行
+				colorline := colorize(line, positions, len(pattern))
+				w.Write([]byte(colorline))
+				matched = true
+			}
+		} else {
+			if strings.Contains(line, pattern) {
+				w.Write([]byte(line))
+				matched = true
+			}
+		}
 
 		if err == io.EOF {
-			return wordPoint, text, nil
+			return matched, nil
 		}
 
 		if err != nil {
-			return wordPoint, text, nil
+			return matched, err
 		}
 	}
 }
 
-func tansaku(line string, pattern string, wordPoint []int, repeatflg bool) wordPoint {
-	if strings.Index(line, pattern) == -1 {
-		return wordPoint
+func findAll(line string, pattern string) []int {
+	if pattern == "" {
+		return nil
 	}
+	positions := []int{}
+	start := 0
+	for {
 
-	i := strings.Index(line, pattern)
-	//探索2回目以降
-	if repeatflg {
-		s := wordPoint[len(wordPoint)-1] + len(pattern) + i
+		i := strings.Index(line[start:], pattern)
+
+		if i == -1 {
+			return positions
+		}
+
+		positions = append(positions, start+i)
+		start += i + len(pattern)
 	}
+}
 
-	if repeatflg {
-		wordPoint.append(wordPoint, s)
-	} else {
-		wordPoint.append(wordPoint, i)
+func colorize(line string, positions []int, patLen int) string {
+	const (
+		colorStart = "\033[1;31m"
+		colorEnd   = "\033[0m"
+	)
+	var b strings.Builder
+	prev := 0
+	for _, p := range positions {
+		b.WriteString(line[prev:p])
+		b.WriteString(colorStart)
+		b.WriteString(line[p : p+patLen])
+		b.WriteString(colorEnd)
+		prev = p + patLen
 	}
-	tansaku(line[i+len(pattern):], pattern, wordPoint, true)
+	b.WriteString(line[prev:])
+	return b.String()
+}
 
+func isTerminal(f *os.File) bool {
+	fi, err := f.Stat()
+	if err != nil {
+		return false
+	}
+	return fi.Mode()&os.ModeCharDevice != 0
 }
